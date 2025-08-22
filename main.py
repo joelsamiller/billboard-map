@@ -1,5 +1,6 @@
 import os
 
+import dotenv
 import folium
 import geopandas as gpd
 import pandas as pd
@@ -24,9 +25,17 @@ def create_dataset() -> gpd.GeoDataFrame:
 
 
 def main():
+    config = dotenv.dotenv_values(".env")
     data = create_dataset()
-
-    m = folium.Map([51, 0], zoom_start=4)
+    tile_url = f"https://tile.jawg.io/jawg-lagoon/{{z}}/{{x}}/{{y}}{{r}}.png?access-token={config['JAWG_API_KEY']}&lang=en"
+    attr = (
+        '<a href="https://jawg.io?utm_medium=map&utm_source=attribution" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib" >'
+        "&copy; <b>Jawg</b>Maps</a>"
+        " | "
+        '<a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">'
+        "&copy; OpenStreetMap</a>"
+    )
+    m = folium.Map([51, 0], zoom_start=7, tiles=tile_url, attr=attr)
     folium.GeoJson(data).add_to(m)
 
     m.save("index.html")
