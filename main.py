@@ -36,7 +36,14 @@ def main():
         "&copy; OpenStreetMap</a>"
     )
     m = folium.Map([51, 0], zoom_start=7, tiles=tile_url, attr=attr)
-    folium.GeoJson(data).add_to(m)
+    folium.GeoJson(
+        data,
+        marker=folium.Marker(
+            icon=folium.Icon(
+                icon="rectangle-ad", prefix="fa", color="cadetblue", icon_color="white"
+            )
+        ),
+    ).add_to(m)
 
     m.save("index.html")
 
