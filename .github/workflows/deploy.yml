@@ -36,10 +36,15 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12' 
+          python-version: '3.12'
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo JAWG_API_KEY=${{ secrets.JAWG_API_KEY }} >> .env
+          cat .env
       - name: Build static files
         run: |
-          wget https://www.arcgis.com/sharing/rest/content/items/3be72478d8454b59bb86ba97b4ee325b/data -P ons_data
+          wget -q https://www.arcgis.com/sharing/rest/content/items/3be72478d8454b59bb86ba97b4ee325b/data -P ons_data
           unzip -j ons_data/data Data/ONSPD_MAY_2025_UK.csv -d ons_data
           mv ons_data/ONSPD_MAY_2025_UK.csv data/ONSPD_MAY_2025_UK.csv
           rm -rf ons_data
