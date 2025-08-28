@@ -4,6 +4,13 @@ import geopandas as gpd
 import pandas as pd
 from folium.plugins import TagFilterButton
 
+COLOURS = {
+    "Tube Stations": "blue",
+    "Train Stations": "orange",
+    "Bus Stops": "red",
+    "Other": "grey",
+}
+
 
 def create_dataset() -> gpd.GeoDataFrame:
     locations = pd.read_csv("data/billboard_locations.csv")[
@@ -13,7 +20,7 @@ def create_dataset() -> gpd.GeoDataFrame:
         locations["Environment"]
         .map(
             {
-                "transit.subway": "Tube/Underground Stations",
+                "transit.subway": "Tube Stations",
                 "transit.train_stations": "Train Stations",
                 "outdoor.bus_shelters": "Bus Stops",
             }
@@ -45,7 +52,11 @@ def main():
         folium.GeoJson(
             group,
             marker=folium.Circle(
-                radius=16, fill_color="blue", fill_opacity=0.4, color="black", weight=1
+                radius=16,
+                fill_color=COLOURS[tag],
+                fill_opacity=0.6,
+                color=COLOURS[tag],
+                weight=1,
             ),
             tags=[tag],
         ).add_to(m)
