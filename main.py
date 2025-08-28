@@ -2,12 +2,24 @@ import dotenv
 import folium
 import geopandas as gpd
 import pandas as pd
+from folium.plugins import TagFilterButton
 
 
 def create_dataset() -> gpd.GeoDataFrame:
     locations = pd.read_csv("data/billboard_locations.csv")[
         ["Name", "Estimated address", "Latitude", "Longitude", "City", "Environment"]
     ]
+    locations["Type"] = (
+        locations["Environment"]
+        .map(
+            {
+                "transit.subway": "Tube/Underground Stations",
+                "transit.train_stations": "Train Stations",
+                "outdoor.bus_shelters": "Bus Stops",
+            }
+        )
+        .fillna("Other")
+    )
     locations = gpd.GeoDataFrame(
         locations,
         geometry=gpd.points_from_xy(locations["Longitude"], locations["Latitude"]),
@@ -29,13 +41,16 @@ def main():
         "&copy; OpenStreetMap</a>"
     )
     m = folium.Map([51, 0], zoom_start=7, tiles=tile_url, attr=attr, prefer_canvas=True)
-    folium.GeoJson(
-        data,
-        marker=folium.Circle(
-            radius=16, fill_color="blue", fill_opacity=0.4, color="black", weight=1
-        ),
-    ).add_to(m)
+    for tag, group in data.groupby("Type"):
+        folium.GeoJson(
+            group,
+            marker=folium.Circle(
+                radius=16, fill_color="blue", fill_opacity=0.4, color="black", weight=1
+            ),
+            tags=[tag],
+        ).add_to(m)
 
+    TagFilterButton(list(data["Type"].unique())).add_to(m)
     m.save("index.html")
 
 
