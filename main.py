@@ -58,6 +58,7 @@ def main():
                 color=COLOURS[tag],
                 weight=1,
             ),
+            popup=folium.GeoJsonPopup(fields=["Name", "Estimated address", "Type"]),
             tags=[tag],
         ).add_to(m)
 
